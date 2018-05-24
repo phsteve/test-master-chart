@@ -1,5 +1,9 @@
 version: '1.0'
 steps:
+  UpdateHelmChartDependencies:
+    image: 'codefresh/cfstep-helm:2.9.1'
+    commands:
+      - helm dependency update
   HelmPush:
     image: 'codefresh/cfstep-helm:2.9.1'
     environment:

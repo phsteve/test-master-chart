@@ -4,17 +4,17 @@ steps:
     image: 'codefresh/cfstep-helm:2.9.1'
     commands:
       - ACTION=auth
-      - helm dependency update
-  HelmPush:
-    image: 'codefresh/cfstep-helm:2.9.1'
-    environment:
-      - ACTION=push
-      - CHART_NAME=./
-      - RELEASE_NAME=master-chart
-      - KUBE_CONTEXT=Beta
-  HelmUpgrade:
-    image: 'codefresh/cfstep-helm:2.9.1'
-    environment:
-      - CHART_NAME=./
-      - RELEASE_NAME=master-chart
-      - KUBE_CONTEXT=Beta
+      - helm repo list
+#  HelmPush:
+#    image: 'codefresh/cfstep-helm:2.9.1'
+#    environment:
+#      - ACTION=push
+#      - CHART_NAME=./
+#      - RELEASE_NAME=master-chart
+#      - KUBE_CONTEXT=Beta
+#  HelmUpgrade:
+#    image: 'codefresh/cfstep-helm:2.9.1'
+#    environment:
+#      - CHART_NAME=./
+#      - RELEASE_NAME=master-chart
+#      - KUBE_CONTEXT=Beta

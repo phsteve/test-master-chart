@@ -3,7 +3,7 @@ steps:
   UpdateHelmChartDependencies:
     image: 'codefresh/cfstep-helm:2.9.1'
     commands:
-      - helm repo add codefresh cm://h.cfcr.io/teacherspayteachers/default/
+      - ACTION=auth
       - helm dependency update
   HelmPush:
     image: 'codefresh/cfstep-helm:2.9.1'

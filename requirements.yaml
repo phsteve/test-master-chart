@@ -1,7 +1,7 @@
 dependencies:
   - name: kube-toy
-    version: 0.1.0-master
+    version: ~0.1.0-any
     repository: '@codefresh'
   - name: kube-service
-    version: 0.1.1-master
+    version: ~0.1.1-any
     repository: '@codefresh'

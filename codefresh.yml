@@ -1,17 +1,18 @@
 version: '1.0'
 steps:
-  AddCFRepo:
+  UpdateSubchartsAndInstallChart:
     image: 'codefresh/cfstep-helm:2.9.1'
     environment:
       - ACTION=auth
+      - CHART_NAME=./
+      - RELEASE_NAME=master-chart
+      - KUBE_CONTEXT=Beta
     commands:
+      - export HELM_REPO_ACCESS_TOKEN=$CF_API_KEY
+      - export HELM_REPO_AUTH_HEADER="x-access-token"
+      - helm repo add codefresh cm://h.cfcr.io/teacherspayteachers/default/
       - helm dep up
-  UpdateHelmChartDependencies:
-    image: 'codefresh/cfstep-helm:2.9.1'
-    environment:
-      - ACTION=auth
-    commands:
-      - helm repo list
+      - /opt/bin/release_chart
 #  HelmPush:
 #    image: 'codefresh/cfstep-helm:2.9.1'
 #    repo: 

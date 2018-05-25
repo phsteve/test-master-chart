@@ -12,6 +12,7 @@ steps:
       - export HELM_REPO_AUTH_HEADER="x-access-token"
       - helm repo add codefresh cm://h.cfcr.io/teacherspayteachers/default/
       - helm dep up
+      - helm repo list
       - helm dep list
       - /opt/bin/release_chart
 #  HelmPush:

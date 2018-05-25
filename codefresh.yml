@@ -2,13 +2,15 @@ version: '1.0'
 steps:
   AddCFRepo:
     image: 'codefresh/cfstep-helm:2.9.1'
-    commands:
+    environment:
       - ACTION=auth
+    commands:
       - helm repo add codefresh cm://h.cfcr.io/teacherspayteachers/default/
   UpdateHelmChartDependencies:
     image: 'codefresh/cfstep-helm:2.9.1'
-    commands:
+    environment:
       - ACTION=auth
+    commands:
       - helm repo list
 #  HelmPush:
 #    image: 'codefresh/cfstep-helm:2.9.1'

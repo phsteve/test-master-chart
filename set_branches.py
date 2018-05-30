@@ -1,5 +1,6 @@
 import yaml
 import os
+import uuid
 
 
 def set_dep_branches(f, branch_requirements):
@@ -21,7 +22,7 @@ def write_values_yaml(branch_requirements):
     for repo in branch_requirements:
         branch = branch_requirements.get(repo)
         if branch:
-            values[repo] =  {'commitHash': branch, 'image':{'tag': branch}}
+            values[repo] =  {'commitHash': str(uuid.uuid1()), 'image':{'tag': branch}}
     print(values)
     with open('Values.yaml', 'w') as f:
         yaml.dump(values, f, default_flow_style=False)

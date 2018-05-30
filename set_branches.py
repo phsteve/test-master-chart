@@ -1,12 +1,8 @@
 import yaml
 import os
 
-branch_requirements = {
-    'kube-toy': os.getenv('CUSTOM_kube_toy'),
-    'kube-service': os.getenv('CUSTOM_kube_service')
-}
 
-def set_dep_branches(f):
+def set_dep_branches(f, branch_requirements):
     y = yaml.load(f)
     for dep in y['dependencies']:
         if dep['name'] in branch_requirements:
@@ -16,12 +12,25 @@ def set_dep_branches(f):
     print(y)
     return y
 
-def write_yaml(deps):
+def write_requirements_yaml(deps):
     with open('requirements.yaml', 'w') as f:
         yaml.dump(deps, f, default_flow_style=False)
 
+def write_values_yaml(branch_requirements):
+    values = {}
+    for req in branch_requirements:
+        if branch_requirements.get(req):
+            values[req] = {'image':{'tag': branch_requirements.get(req)}}
+    print(values)
+    with open('Values.yaml', 'w') as f:
+        yaml.dump(values, f, default_flow_style=False)
+
 if __name__ == '__main__':
+    branch_requirements = {
+        'kube-toy': os.getenv('CUSTOM_kube_toy'),
+        'kube-service': os.getenv('CUSTOM_kube_service')
+    }
     with open('requirements.yaml') as f:
-        deps = set_dep_branches(f)
-    with open('requirements.yaml', 'w') as f:
-        write_yaml(deps)
+        deps = set_dep_branches(f, branch_requirements)
+    write_requirements_yaml(deps)
+    write_values_yaml(branch_requirements)

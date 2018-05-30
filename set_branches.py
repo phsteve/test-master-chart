@@ -18,9 +18,10 @@ def write_requirements_yaml(deps):
 
 def write_values_yaml(branch_requirements):
     values = {}
-    for req in branch_requirements:
-        if branch_requirements.get(req):
-            values[req] = {'image':{'tag': branch_requirements.get(req)}}
+    for repo in branch_requirements:
+        branch = branch_requirements.get(repo)
+        if branch:
+            values[repo] =  {'commitHash': branch, 'image':{'tag': branch}}
     print(values)
     with open('Values.yaml', 'w') as f:
         yaml.dump(values, f, default_flow_style=False)

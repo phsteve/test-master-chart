@@ -13,6 +13,7 @@ def set_dep_branches(f):
             if not branch_requirements[dep['name']]:
                 continue
             dep['version'] = dep['version'].replace('any', branch_requirements[dep['name']])
+    print(y)
     return y
 
 def write_yaml(deps):

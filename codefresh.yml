@@ -1,6 +1,11 @@
-version: '1.0'
+version: "1.0"
 steps:
-  UpdateSubchartsAndInstallChart:
+  SetDependencyYAML:
+    image: 'python'
+    commands:
+      - pip install pyyaml #TODO: build this into the image or do something better
+      - python set_branches.py
+  UpdateSubcharts:
     image: 'codefresh/cfstep-helm:2.9.1'
     environment:
       - ACTION=auth
@@ -12,20 +17,11 @@ steps:
       - export HELM_REPO_AUTH_HEADER="x-access-token"
       - helm repo add codefresh cm://h.cfcr.io/teacherspayteachers/default/
       - helm dep up
-      - helm repo list
-      - helm dep list
       - /opt/bin/release_chart
-#  HelmPush:
-#    image: 'codefresh/cfstep-helm:2.9.1'
-#    repo: 
-#    environment:
-#      - ACTION=push
-#      - CHART_NAME=./
-#      - RELEASE_NAME=master-chart
-#      - KUBE_CONTEXT=Beta
-#  HelmUpgrade:
-#    image: 'codefresh/cfstep-helm:2.9.1'
-#    environment:
-#      - CHART_NAME=./
-#      - RELEASE_NAME=master-chart
-#      - KUBE_CONTEXT=Beta
+  InstallChart:
+    image: 'codefresh/cfstep-helm:2.9.1'
+    environment:
+      - CHART_NAME=./
+      - RELEASE_NAME=master-chart
+      - KUBE_CONTEXT=Beta
+      - VALUESFILE_beta='Values.yaml'

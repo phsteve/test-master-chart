@@ -18,9 +18,20 @@ steps:
       - helm repo add codefresh cm://h.cfcr.io/teacherspayteachers/default/
       - helm dep up
       - /opt/bin/release_chart
+  createNamespace:
+    title: Create new namespace
+    image: codefresh/kube-helm:master
+    environment:
+      - KUBE_CONTEXT=Beta
+    commands:
+      - cf_export CUSTOM_NAMESPACE="${{CUSTOM_kube_toy}}-${{CUSTOM_kube_service}}"
+      - kubectl config use-context "${KUBE_CONTEXT}"
+      - kubectl create namespace "${CUSTOM_NAMESPACE}" || echo "Namespace ${CUSTOM_NAMESPACE} already exists, skipping..."
+      - kubectl get secret codefresh-generated-r.cfcr.io-cfcr-default -o json | jq '.metadata.namespace = env.CUSTOM_NAMESPACE' | kubectl create --namespace "${CUSTOM_NAMESPACE}" -f - || echo "Secret already exists, skipping..."
   InstallChart:
     image: 'codefresh/cfstep-helm:2.9.1'
     environment:
+      - NAMESPACE=$CUSTOM_NAMESPACE
       - CHART_NAME=./
       - RELEASE_NAME=master-chart
       - KUBE_CONTEXT=Beta

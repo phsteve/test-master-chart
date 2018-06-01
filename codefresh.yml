@@ -18,21 +18,31 @@ steps:
       - helm repo add codefresh cm://h.cfcr.io/teacherspayteachers/default/
       - helm dep up
       - /opt/bin/release_chart
+      # TODO: do we also need to push the master-chart chart?
   createNamespace:
     title: Create new namespace
     image: codefresh/kube-helm:master
     environment:
       - KUBE_CONTEXT=Beta
     commands:
-      - cf_export CUSTOM_NAMESPACE="${{CUSTOM_kube_toy}}-${{CUSTOM_kube_service}}"
-      - kubectl config use-context "${KUBE_CONTEXT}"
-      - kubectl create namespace "${CUSTOM_NAMESPACE}" || echo "Namespace ${CUSTOM_NAMESPACE} already exists, skipping..."
-      - kubectl get secret codefresh-generated-r.cfcr.io-cfcr-default -o json | jq '.metadata.namespace = env.CUSTOM_NAMESPACE' | kubectl create --namespace "${CUSTOM_NAMESPACE}" -f - || echo "Secret already exists, skipping..."
+      - set -euxo pipefail
+      #- echo CUSTOM_NAMESPACE=${{CUSTOM_kube_toy}}-${{CUSTOM_kube_service}} >> ${{CF_VOLUME_PATH}}/env_vars_to_export
+      - export CUSTOM_NAMESPACE=${{CUSTOM_kube_toy}}-${{CUSTOM_kube_service}}
+      #- cf_export CUSTOM_NAMESPACE="${{CUSTOM_kube_toy}}-${{CUSTOM_kube_service}}"
+      #- cat ${{CF_VOLUME_PATH}}/env_vars_to_export
+      - echo $CUSTOM_NAMESPACE
+      - kubectl config use-context "$KUBE_CONTEXT"
+      # TODO: The || trick below is to supress errors when the namespace is already configured. Unfortunately it will also swallow legit errors, which we should change.
+      - kubectl create namespace "$CUSTOM_NAMESPACE" || echo "Namespace $CUSTOM_NAMESPACE already exists, skipping..."
+      - kubectl get secret codefresh-generated-r.cfcr.io-cfcr-default -o json | jq '.metadata.namespace = env.CUSTOM_NAMESPACE' | kubectl create --namespace "$CUSTOM_NAMESPACE" -f - || echo "Helm secret already exists, skipping..."
+      - kubectl get secret codefresh-docker-registry -o json | jq '.metadata.namespace = env.CUSTOM_NAMESPACE' | kubectl create --namespace "$CUSTOM_NAMESPACE" -f - || echo "Docker secret already exists, skipping..."
+      - kubectl get secret codefresh-token-hx4gw -o json | jq '.metadata.namespace = env.CUSTOM_NAMESPACE' | kubectl create --namespace "$CUSTOM_NAMESPACE" -f - || echo "CF Service Acct secret already exists, skipping..."
   InstallChart:
     image: 'codefresh/cfstep-helm:2.9.1'
     environment:
-      - NAMESPACE=$CUSTOM_NAMESPACE
+      # TODO: DRY NAMESPACE variable here and in previous step
+      - NAMESPACE="${{CUSTOM_kube_toy}}-${{CUSTOM_kube_service}}"
       - CHART_NAME=./
-      - RELEASE_NAME=master-chart
+      - RELEASE_NAME="master-chart-${{CUSTOM_kube_toy}}-${{CUSTOM_kube_service}}"
       - KUBE_CONTEXT=Beta
       - VALUESFILE_beta='Values.yaml'
